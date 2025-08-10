@@ -22,14 +22,27 @@ def pwned_api_check(password):
     response = request_api_data(first5_char)
     return get_password_leaks_count(response,tail)
 
+def quick_strength_hint(password):
+    tips = []
+    if len(password) < 12:
+        tips.append("use at least 12 characters")
+    if password.islower() or password.isupper():
+        tips.append("mix uppercase and lowercase letters")
+    if password.isalpha() or password.isdigit():
+        tips.append("add numbers and special characters")
+    if tips:
+        return " • Quick hint: " + ", ".join(tips) + "."
+    else:
+        return "Looks strong!"
+
 def main():
     password = input('Enter your password: ')
     count = pwned_api_check(password)
+    print(quick_strength_hint(password))
     if count:
         print(f'{password} is leaked {count} times.. change your password')
     else:
         print(f'{password} was NOT found.')
-    return 'done!'
 
 if __name__ == '__main__':
     sys.exit(main())
