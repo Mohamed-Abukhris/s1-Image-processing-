@@ -35,14 +35,26 @@ def quick_strength_hint(password):
     else:
         return "Looks strong!"
 
+def show_sha1_preview(password):
+    sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+    print(f"SHA-1 hash: {sha1_hash}")
+    print(f"Prefix sent to API: {prefix}")
+    print(f"Remaining suffix kept locally: {suffix}")
+
+
 def main():
     password = input('Enter your password: ')
+    show_sha1_preview(password)
+
     count = pwned_api_check(password)
-    print(quick_strength_hint(password))
     if count:
         print(f'{password} is leaked {count} times.. change your password')
     else:
         print(f'{password} was NOT found.')
+
+    print(quick_strength_hint(password))
+    return 'done!'
 
 if __name__ == '__main__':
     sys.exit(main())
