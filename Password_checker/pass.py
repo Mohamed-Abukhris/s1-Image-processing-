@@ -54,7 +54,6 @@ def main():
         print(f'{password} was NOT found.')
 
     print(quick_strength_hint(password))
-    return 'done!'
 
 if __name__ == '__main__':
     sys.exit(main())
