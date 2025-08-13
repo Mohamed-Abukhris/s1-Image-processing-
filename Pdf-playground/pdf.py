@@ -19,6 +19,17 @@ def pdf_combiner(pdf_list):
         merger.write(fo)
     print("Merged pdf saved as super.pdf")
 
+def extract_text_from_pdf(pdf_path):
+
+    reader = PdfFileReader(open(pdf_path, "rb"))
+    all_text = ""
+    for page_num in range(reader.getNumPages()):
+        page_text = reader.getPage(page_num).extractText()
+        all_text += page_text + "\n"
+    print("----- Extracted Text -----")
+    print(all_text)
+    return all_text
+
 pdf_combiner(pdf_files)
 
 template = PyPDF2.PdfFileReader(open('super.pdf', 'rb'))
@@ -53,3 +64,5 @@ for i in range(existing_pdf.getNumPages()):
 
 with open("output_with_logo.pdf", "wb") as outputStream:
     output.write(outputStream)
+
+extract_text_from_pdf("output_with_logo.pdf")
