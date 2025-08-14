@@ -26,7 +26,7 @@ def extract_text_from_pdf(pdf_path):
     for page_num in range(reader.getNumPages()):
         page_text = reader.getPage(page_num).extractText()
         all_text += page_text + "\n"
-    print("----- Extracted Text -----")
+    print("___Extracted Text___")
     print(all_text)
     return all_text
 
