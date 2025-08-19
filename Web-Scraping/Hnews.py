@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pprint
+import csv
 
 res = requests.get('https://news.ycombinator.com/news')
 res2 = requests.get('https://news.ycombinator.com/news?p=2')
@@ -35,4 +36,16 @@ def create_custom_hn(links, subtext):
                 hn.append({'title': title, 'link': href, 'votes': points})
     return sort_stories_by_votes(hn)
 
-pprint.pprint(create_custom_hn(mega_links , mega_subtext))
+def save_to_csv(items, filename='hn_top.csv'):
+    fieldnames = ['title', 'link', 'votes']
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for it in items:
+            writer.writerow(it)
+    print(f"Saved {len(items)} items to {filename}")
+
+stories = create_custom_hn(mega_links, mega_subtext)
+pprint.pprint(stories)
+save_to_csv(stories, 'hn_top_over_100_votes.csv')
+
