@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pprint
-import csv
+import csv , re
 
 res = requests.get('https://news.ycombinator.com/news')
 res2 = requests.get('https://news.ycombinator.com/news?p=2')
@@ -29,21 +29,37 @@ def create_custom_hn(links, subtext):
         if href and href.startswith('item?id='):
             href = 'https://news.ycombinator.com/' + href
 
-        vote = subtext[idx].select('.score') if idx < len(subtext) else []
+        s = subtext[idx] if idx < len(subtext) else None
+        vote = s.select('.score') if s else []
         if vote:
             points = int(vote[0].get_text().split()[0])
+
+            comments = 0
+            if s:
+                for a2 in s.select('a'):
+                    txt = a2.get_text(' ', strip=True).lower()
+                    if 'comment' in txt or txt == 'discuss':
+                        m = re.search(r'(\d+)\s*comment', txt)
+                        comments = int(m.group(1)) if m else 0
+                        break
+
             if points > 99:
-                hn.append({'title': title, 'link': href, 'votes': points})
+                hn.append({
+                    'title': title,
+                    'link': href,
+                    'votes': points,
+                    'comments': comments
+                })
     return sort_stories_by_votes(hn)
 
 def save_to_csv(items, filename='hn_top.csv'):
-    fieldnames = ['title', 'link', 'votes']
-    with open(filename, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for it in items:
-            writer.writerow(it)
-    print(f"Saved {len(items)} items to {filename}")
+        fieldnames = ['title', 'link', 'votes', 'comments']
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for it in items:
+                writer.writerow(it)
+        print(f"Saved {len(items)} items to {filename}")
 
 stories = create_custom_hn(mega_links, mega_subtext)
 pprint.pprint(stories)
